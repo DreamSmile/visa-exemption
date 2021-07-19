@@ -18,7 +18,7 @@
           <span>开始时间</span><sup>*</sup>
         </div>
         <div class="answer">
-          <span :class="{hasEdit:startDateShow}" @click="openStart(true)">{{startDateShow?startDateShow:'请选择开始时间'}}</span>
+          <span :class="{hasEdit:startDateShow}" @click="openStart(true)">{{startDateShow?$utils.changeDate(startDateShow):'请选择开始时间'}}</span>
           <van-icon name="arrow-down" color="#B1B1B1" class="first_el" />
           <van-popup v-model="showstartTime" position="bottom" :style="{ height: '50%' }">
             <van-datetime-picker @cancel="openStart(false)" :formatter="formatter" @confirm="openStart(false,$event)" v-model="startDate" type="date" title="选择开始时间" />
@@ -36,10 +36,10 @@
           <span>结束时间</span><sup>*</sup>
         </div>
         <div class="answer">
-          <span :class="{hasEdit:endDateShow}" @click="openEnd(true)">{{endDateShow?endDateShow:'请选择开始时间'}}</span>
+          <span :class="{hasEdit:endDateShow}" @click="openEnd(true)">{{endDateShow?$utils.changeDate(endDateShow):'请选择开始时间'}}</span>
           <van-icon name="arrow-down" color="#B1B1B1" class="first_el" />
           <van-popup v-model="showEndTime" position="bottom" :style="{ height: '50%' }">
-            <van-datetime-picker @cancel="openEnd(false)" :formatter="formatter" @confirm="openEnd(false,$event)" v-model="endDate" type="date" title="选择开始时间" />
+            <van-datetime-picker :min-date="minDate?minDate:new Date()" @cancel="openEnd(false)" :formatter="formatter" @confirm="openEnd(false,$event)" v-model="endDate" type="date" title="选择开始时间" />
           </van-popup>
           <van-popover v-model="showEnd" trigger="click" :actions="endActions" @select="endSelect">
             <template #reference>
@@ -54,7 +54,7 @@
           <span>免签天数</span><sup>*</sup>
         </div>
         <div class="answer">
-          <span class="hasEdit">一天</span>
+          <span class="hasEdit">{{dataSpace}}天</span>
         </div>
       </div>
       <div class="rows">
@@ -85,7 +85,7 @@
           <li v-for="(item,i) in userList" :key="i">
             <div class="items">
               <span>{{item.name}}</span>
-              <van-icon name="cross" color="#5177F4" />
+              <van-icon @click="removeUer(i)" name="cross" color="#5177F4" />
             </div>
           </li>
         </ul>
@@ -97,7 +97,7 @@
     </div>
     <!-- 选择人员弹出层 -->
     <van-popup v-model="showChoice" closeable position="bottom" :style="{ height: '90%' }">
-      <choice-more></choice-more>
+      <choice-more :isMore="true" @setUserListM="setUserList"></choice-more>
     </van-popup>
   </div>
 </template>
@@ -107,16 +107,17 @@ export default {
   data() {
     return {
       time: "", //签卡日期
-      userList: [{ name: "林某某" }], //签卡选中的人
+      userList: [], //签卡选中的人
       showstartTime: false,
       startDate: "", //开始时间，默认当天
-      startDateShow: this.$utils.changeDate(new Date()), //展示在页面的时间
+      startDateShow: new Date(), //展示在页面的时间
       showStart: false, //开始时间下拉框
       start: "", //开始时间
       startActions: [{ text: "上午" }, { text: "下午" }],
       showEndTime: false,
+      minDate: null, //结束时间最少从某处选择
       endDate: "",
-      endDateShow: this.$utils.changeDate(new Date()),
+      endDateShow: new Date(),
       showEnd: false,
       end: "",
       endActions: [{ text: "上午" }, { text: "下午" }],
@@ -126,7 +127,31 @@ export default {
     };
   },
   components: { ChoiceMore },
+  watch: {
+    startDateShow: function (val) {
+      //监听开始时间选择
+      this.minDate = val;
+    },
+  },
+  computed: {
+    dataSpace: function (val) {
+      let time = this.endDateShow.getTime() - this.startDateShow.getTime();
+      return Math.ceil(time / (24 * 60 * 60 * 1000));
+    },
+  },
+
   methods: {
+    // 移除用户列表
+    removeUer(index) {
+      this.userList.splice(index, 1);
+    },
+    // 子组件选好的人员
+    setUserList(isOpen, val) {
+      console.log("子组件");
+      this.showChoice = isOpen;
+      val.length > 0 ? (this.userList = val) : "";
+      console.log(val);
+    },
     // 一键选择
     onceName() {
       if (!this.once) {
@@ -145,7 +170,7 @@ export default {
     //开始时间选择弹出层确定关闭，并且格式化时间
     openStart(type, time) {
       this.showstartTime = type;
-      time ? (this.startDateShow = this.$utils.changeDate(time)) : "";
+      time ? (this.startDateShow = time) : "";
     },
     // 结束时间上下午选择
     endSelect(action) {
@@ -154,7 +179,7 @@ export default {
     // 结束时间选择弹出层关闭，并且格式化时间
     openEnd(type, time) {
       this.showEndTime = type;
-      time ? (this.endDateShow = this.$utils.changeDate(time)) : "";
+      time ? (this.endDateShow = time) : "";
     },
     // 时间选择
     formatter(type, value) {
@@ -177,6 +202,7 @@ export default {
         })
         .then((res) => {
           this.userList = [];
+          this.once = false;
         })
         .catch(() => {});
     },
@@ -187,6 +213,9 @@ export default {
 .more {
   background-color: #fff;
   height: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: space-between;
   .once {
     margin: 0 15px 10px 15px;
     padding: 10px 12px 0 12px;
@@ -307,6 +336,7 @@ export default {
   }
   .fix {
     width: 100%;
+    max-width: 540px;
     position: fixed;
     bottom: 0;
     left: 0;

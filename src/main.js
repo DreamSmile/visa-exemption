@@ -4,13 +4,13 @@ import router from './router'
 import store from './store'
 import "./assets/phoneReset.css"
 import * as utils from './utils/tools'
-import { Icon, Popover, Button, Popup, DatetimePicker, Toast, Dialog, NoticeBar, Search, CheckboxGroup, Checkbox } from 'vant'
+import { Icon, Popover, Button, Popup, DatetimePicker, Toast, Dialog, NoticeBar, Search, CheckboxGroup, Checkbox, Picker } from 'vant'
 
 Vue.config.productionTip = false
 Vue.prototype.$utils = utils;
 Vue.use(Icon).use(Button).use(NoticeBar).use(Search).use(CheckboxGroup).use(Checkbox)
 Vue.use(Toast).use(Dialog)
-Vue.use(Popover).use(Popup).use(DatetimePicker)
+Vue.use(Popover).use(Popup).use(DatetimePicker).use(Picker)
 
 new Vue({
   router,

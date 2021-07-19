@@ -29,8 +29,8 @@
         <div class="problem">
           <span>选择人员</span><sup>*</sup>
         </div>
-        <div class="answer">
-          <span :class="{hasEdit:userList.length>0}">{{userList.legth>0?`已选择${userList.lenght}人`:'请选择'}}</span>
+        <div class="answer" @click="choiceOpen">
+          <span :class="{hasEdit:userList.length>0}">{{userList.length>0?`已选择${userList.length}人`:'请选择'}}</span>
           <van-icon name="arrow-down" color="#B1B1B1" />
         </div>
       </div>
@@ -61,10 +61,10 @@
       <textarea placeholder="请填写免签卡事由" v-model="reason"></textarea>
       <div class="rows">
         <div class="problem">
-          <span>已选人员({{userList.lenght}})</span>
+          <span>已选人员({{userList.length}})</span>
         </div>
         <div class="answer">
-          <span class="font_blue">清除全部</span>
+          <span class="font_blue" @click="clearAll">清除全部</span>
         </div>
       </div>
       <div class="user_box">
@@ -72,7 +72,7 @@
           <li v-for="(item,i) in userList" :key="i">
             <div class="items">
               <span>{{item.name}}</span>
-              <van-icon name="cross" color="#5177F4" />
+              <van-icon @click="removeUer(i)" name="cross" color="#5177F4" />
             </div>
           </li>
         </ul>
@@ -82,14 +82,19 @@
     <div class="fix">
       <van-button color="#5177F4" type="info" block>保存</van-button>
     </div>
+    <!-- 选择人员弹出层 -->
+    <van-popup v-model="showChoice" closeable position="bottom" :style="{ height: '90%' }">
+      <choice-more :isMore="false" @setUserListS="setUserList"></choice-more>
+    </van-popup>
   </div>
 </template>
 <script>
+import ChoiceMore from "./choiceMore.vue";
 export default {
   data() {
     return {
       time: "", //签卡日期
-      userList: [{ name: "林某某" }], //签卡选中的人
+      userList: [], //签卡选中的人
       showSeason: false, //时令选择
       season: "", //时令
       seasonActions: [
@@ -106,9 +111,38 @@ export default {
       dateShow: this.$utils.changeDate(new Date()), //展示在页面上的时间
       showTime: false, //是否打开时间选择
       datePicker: "",
+      showChoice: false,
     };
   },
+  components: { ChoiceMore },
   methods: {
+    // 清除全部
+    clearAll() {
+      this.$utils
+        .showDialog("确定清除所有已选人员？", "询 问", {
+          confirmButtonText: "确定",
+          showCancelButton: true,
+          cancelButtonText: "取消",
+        })
+        .then((res) => {
+          this.userList = [];
+          this.once = false;
+        })
+        .catch(() => {});
+    },
+    // 删除个别人员
+    removeUer(index) {
+      this.userList.splice(index, 1);
+    },
+    // 子组件选择人员后
+    setUserList(isOpen, val) {
+      this.showChoice = isOpen;
+      val.length > 0 ? (this.userList = val) : "";
+    },
+    // 打开选择人员弹出层
+    choiceOpen() {
+      this.showChoice = true;
+    },
     // 是否打开时间选择
     open(type, time) {
       this.showTime = type;
@@ -181,6 +215,10 @@ export default {
       color: #5177f4;
       background-color: #e8f1ff;
       border-radius: 4px;
+    }
+    .isOnce {
+      background-color: #edeff2;
+      color: #90929a;
     }
   }
   .form {
