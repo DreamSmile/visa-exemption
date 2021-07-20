@@ -14,13 +14,33 @@ module.exports = {
         host: '0.0.0.0',
         port: 8080,
         proxy: {
-            '/api': {
-                target: 'http://192.168.35.231/tl_cw/zw_t_fksqspb_llCore.ashx',
+            '/wxAuto': {
+                target: 'http://tm.lilanz.com/oa/api/WxAuthForLilanz.ashx',
                 changeOrigin: true,
                 pathRewrite: {
+                    '^/wxAuto': ''
+                }
+            },
+            '/getUser': {
+                target: 'http://webt.lilang.com:8901/svr-loadorder/wxFans/',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/getUser': ''
+                }
+            }, '/api': {
+                target: 'http://webt.lilang.com/api-proxy/lilanz-gateway/svr-develop/',
+                pathRewrite: {
+                    changeOrigin: true,
                     '^/api': ''
                 }
             },
+            '/user': {
+                target: 'http://tm.lilanz.com/oa/project/MobileApplyCheck/applycheckcore.ashx',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/user': ''
+                }
+            }
         }
     }
 }

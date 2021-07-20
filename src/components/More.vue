@@ -92,12 +92,12 @@
       </div>
     </div>
     <!-- 保存按钮 -->
-    <div class="fix">
+    <div class="fix" v-show="isBtnHidden">
       <van-button color="#5177F4" type="info" block>保存</van-button>
     </div>
     <!-- 选择人员弹出层 -->
     <van-popup v-model="showChoice" closeable position="bottom" :style="{ height: '90%' }">
-      <choice-more :isMore="true" @setUserListM="setUserList"></choice-more>
+      <choice-more :isMore="true" @setUserListM="setUserList" @close="close" :isBtnHidden="isBtnHidden"></choice-more>
     </van-popup>
   </div>
 </template>
@@ -133,24 +133,31 @@ export default {
       this.minDate = val;
     },
   },
+  props: {
+    isBtnHidden: {
+      type: Boolean,
+      default: true,
+    },
+  },
   computed: {
     dataSpace: function (val) {
       let time = this.endDateShow.getTime() - this.startDateShow.getTime();
       return Math.ceil(time / (24 * 60 * 60 * 1000));
     },
   },
-
   methods: {
+    // 关闭选择人员弹窗
+    close(isOpen) {
+      this.showChoice = isOpen;
+    },
     // 移除用户列表
     removeUer(index) {
       this.userList.splice(index, 1);
     },
     // 子组件选好的人员
     setUserList(isOpen, val) {
-      console.log("子组件");
       this.showChoice = isOpen;
       val.length > 0 ? (this.userList = val) : "";
-      console.log(val);
     },
     // 一键选择
     onceName() {
@@ -194,6 +201,9 @@ export default {
     },
     // 清除全部
     clearAll() {
+      if (this.userList.length < 1) {
+        return;
+      }
       this.$utils
         .showDialog("确定清除所有已选人员？", "询 问", {
           confirmButtonText: "确定",
@@ -306,6 +316,7 @@ export default {
       padding: 10px 14px;
       color: #262626;
       box-sizing: border-box;
+      resize: none;
     }
     .user_box {
       padding: 10px 0;
@@ -337,6 +348,7 @@ export default {
   .fix {
     width: 100%;
     max-width: 540px;
+    margin: auto;
     position: fixed;
     bottom: 0;
     left: 0;

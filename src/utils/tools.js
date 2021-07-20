@@ -1,4 +1,11 @@
 import { Toast, Dialog } from 'vant';
+// 判断缓存中数据有没有过期,没有过期返回true
+export function overdue() {
+    let old = localStorage.getItem("VISA_TIME");
+    return new Date().getTime() - old < 2592000000
+}
+
+
 // 标准时间转换成yyyy-mm-dd
 export function changeDate(time) {
     let year = time.getFullYear();

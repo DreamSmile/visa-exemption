@@ -1,6 +1,9 @@
 <template>
   <div class="choiceMore">
-    <h1>添加人员</h1>
+    <div class="con_title">
+      <h1>添加人员</h1>
+      <van-icon size="22px" color="#C1C1C1" @click="close" name="cross" />
+    </div>
     <van-notice-bar left-icon="info-o" wrapable :scrollable="false" v-show="isMore" text="请注意选择人员，保存后人员将不能再修改！" />
     <van-notice-bar left-icon="info-o" wrapable :scrollable="false" v-show="!isMore" text="请注意选择人员，保存后人员将不能再修改！选择人员之后才会出来所排的班次，所选人员必须是一样的班次！" />
     <van-search v-model="searchVal" placeholder="请输入人员编号或姓名" />
@@ -49,7 +52,7 @@
       </div>
     </div>
     <!-- 底部按钮组 -->
-    <div class="fix">
+    <div class="fix" v-show="isBtnHidden">
       <van-button class="btn" type="default" @click="reset">清除</van-button>
       <van-button class="btn" type="info" @click="sure">确定 ({{checkList.length}})</van-button>
     </div>
@@ -101,8 +104,17 @@ export default {
       type: Boolean,
       default: true,
     },
+    isBtnHidden: {
+      type: Boolean,
+      default: true,
+    },
   },
   methods: {
+    // 让父组件关闭弹窗
+    close() {
+      console.log("关闭");
+      this.$emit("close", false);
+    },
     // 取消选择部门
     cancel() {
       this.showChoiceDep = false;
@@ -159,12 +171,26 @@ export default {
 <style scoped lang="less">
 .choiceMore {
   margin-bottom: 64px;
-  h1 {
-    font-size: 20px;
-    line-height: 28px;
-    color: #262626;
-    margin: 16px;
+  .con_title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+    right: 16px;
+    h1 {
+      font-size: 20px;
+      line-height: 28px;
+      color: #262626;
+      margin: 16px;
+    }
+    i {
+      margin-right: 16px;
+    }
   }
+
   /deep/.van-notice-bar__content {
     font-size: 12px;
     line-height: 16px;
@@ -228,6 +254,9 @@ export default {
       text-align: center;
       .Checkboxs {
         width: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
       .name {
         width: 30%;
@@ -252,6 +281,9 @@ export default {
           text-align: center;
           .Checkboxs {
             width: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
           .name {
             width: 30%;

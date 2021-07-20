@@ -79,12 +79,12 @@
       </div>
     </div>
     <!-- 保存按钮 -->
-    <div class="fix">
+    <div class="fix" v-show="isBtnHidden">
       <van-button color="#5177F4" type="info" block>保存</van-button>
     </div>
     <!-- 选择人员弹出层 -->
     <van-popup v-model="showChoice" closeable position="bottom" :style="{ height: '90%' }">
-      <choice-more :isMore="false" @setUserListS="setUserList"></choice-more>
+      <choice-more :isMore="false" @setUserListS="setUserList" @close="close" :isBtnHidden="isBtnHidden"></choice-more>
     </van-popup>
   </div>
 </template>
@@ -115,9 +115,22 @@ export default {
     };
   },
   components: { ChoiceMore },
+  props: {
+    isBtnHidden: {
+      type: Boolean,
+      default: true,
+    },
+  },
   methods: {
+    // 关闭选择人员弹窗
+    close(isOpen) {
+      this.showChoice = isOpen;
+    },
     // 清除全部
     clearAll() {
+      if (this.userList.length < 1) {
+        return;
+      }
       this.$utils
         .showDialog("确定清除所有已选人员？", "询 问", {
           confirmButtonText: "确定",
@@ -259,6 +272,7 @@ export default {
     }
     textarea {
       height: 104px;
+      resize: none;
       border-radius: 4px;
       border: 1px solid #e8e8e8;
       width: 100%;
@@ -296,6 +310,8 @@ export default {
   .fix {
     width: 100%;
     position: fixed;
+    max-width: 540px;
+    margin: auto;
     bottom: 0;
     left: 0;
     right: 0;

@@ -9,15 +9,6 @@ const routes = [
     name: 'Home',
     component: () => import('../views/Home.vue')
   }
-  // , {
-  //   path: '/more',
-  //   name: 'More',
-  //   component: () => import('../views/More.vue')
-  // }, {
-  //   path: '/single',
-  //   name: 'Single',
-  //   component: () => import('../views/Single.vue')
-  // }
 
 ]
 
