@@ -73,6 +73,7 @@ export default {
         window.location.replace(url + backurl);
       }
     },
+    
     // 清除用户信息
     clearUser() {
       localStorage.removeItem("VISA_USER");
